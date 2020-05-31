@@ -1,0 +1,36 @@
+language: generic
+
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t zepdock97/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run -e CI=true zepdock97/react-test npm test 
+
+after_success:
+    - docker build -t zepdock97/multi-client ./client
+    - docker build -t zepdock97/multi-nginx ./nginx
+    - docker build -t zepdock97/multi-server ./server
+    - docker build -t zepdock97/multi-worker ./worker
+    # Log in to the docker CLI
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take those images and push them to docker hub
+    - docker push zepdock97/multi-client
+    - docker push zepdock97/multi-nginx
+    - docker push zepdock97/multi-server
+    - docker push zepdock97/multi-worker
+
+deploy:
+    provider: elasticbeanstalk
+    region: us-east-2
+    app: multi-docker
+    env: MultiDocker-env
+    bucket_name: <S3Bucketname>
+    bucket_path: docker-multi
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY

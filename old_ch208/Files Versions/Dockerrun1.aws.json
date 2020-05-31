@@ -1,0 +1,23 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "client",
+            "image": "zepdock97/multi-client",
+            "hostname": "client",
+            "essential": false
+        },
+        {
+            "name": "server",
+            "image": "zepdock97/multi-server",
+            "hostname": "api",
+            "essential": false
+        }
+        {
+            "name": "worker",
+            "image": "zepdock97/multi-worker",
+            "hostname": "worker",
+            "essential": false
+        }
+    ]
+}
